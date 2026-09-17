@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+
+    <meta property="og:title" content="Zigbert · Pay &amp; Benefits Intelligence" />
+    <meta property="og:description" content="Personalised pay and benefits intelligence by TwentySix Consulting" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Zigbert · Pay &amp; Benefits Intelligence" />
+    <meta name="twitter:description" content="Personalised pay and benefits intelligence by TwentySix Consulting" />
+
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,400..700&display=swap" rel="stylesheet">
+    <title>Zigbert · Pay &amp; Benefits Intelligence</title>
+
+    <!-- Guided tour (shared engine; also loaded by the static Pay/Benefits shells) -->
+    <link rel="stylesheet" href="shell/tour.css" />
+    <script defer src="shell/tour.js"></script>
+
+    <!-- GitHub Pages SPA redirect handler -->
+    <script>
+      (function(l) {
+        if (l.search[1] === '/') {
+          var decoded = l.search.slice(1).split('&').map(function(s) {
+            return s.replace(/~and~/g, '&');
+          }).join('?');
+          window.history.replaceState(null, null,
+            l.pathname.slice(0, -1) + decoded + l.hash
+          );
+        }
+      }(window.location));
+    </script>
+    <script src="gate.js"></script>
+  <script>
+  (function () {
+    var ENC = "assets/app.enc";
+    function boot(bytes) {
+      var url = URL.createObjectURL(new Blob([bytes], { type: "text/javascript" }));
+      var s = document.createElement("script");
+      s.type = "module";
+      s.src = url;
+      document.body.appendChild(s);
+      var g = document.getElementById("se-gate");
+      if (g) g.remove();
+    }
+    async function tryOpen(secret, username) {
+      var bytes = await window.SEGate.load(ENC, secret);
+      window.SEGate.remember(secret, username);
+      boot(bytes);
+    }
+    window.addEventListener("DOMContentLoaded", function () {
+      var remembered = window.SEGate.remembered();
+      if (remembered) {
+        tryOpen(remembered, remembered.split(":")[0]).catch(function () {
+          window.SEGate.forget();
+          window.location.reload();
+        });
+        return;
+      }
+      var f = document.getElementById("se-form");
+      if (!f) return;
+      f.addEventListener("submit", function (e) {
+        e.preventDefault();
+        var u = document.getElementById("se-u").value.trim();
+        var p = document.getElementById("se-p").value;
+        var btn = document.getElementById("se-go");
+        var err = document.getElementById("se-err");
+        err.style.display = "none";
+        btn.disabled = true;
+        btn.textContent = "Unlocking\u2026";
+        // The key is derived from the credentials, so a wrong password simply
+        // fails to decrypt. There is no comparison to bypass.
+        tryOpen(u.toLowerCase() + ":" + p, u).catch(function () {
+          btn.disabled = false;
+          btn.textContent = "Open the dashboard";
+          err.style.display = "block";
+          document.getElementById("se-p").value = "";
+        });
+      });
+    });
+  })();
+  </script>
+
+    <link rel="stylesheet" crossorigin href="/sussex-emmaus/assets/index-DApBUnZw.css">
+  
+  <style>
+    .se-gate{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;
+      justify-content:center;background:#fff;font-family:Inter,system-ui,sans-serif;padding:24px}
+    .se-card{width:100%;max-width:420px;text-align:left}
+    .se-brand{font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+      color:#7285A5;margin-bottom:18px}
+    .se-title{font-size:26px;font-weight:700;color:#121C2B;margin:0 0 6px;letter-spacing:-.02em}
+    .se-sub{font-size:13px;color:#5A6472;margin:0 0 22px}
+    .se-lbl{display:block;font-size:12px;font-weight:600;color:#121C2B;margin:0 0 5px}
+    .se-in{width:100%;box-sizing:border-box;padding:10px 12px;font-size:14px;
+      border:1px solid #DEE1E6;border-radius:8px;margin-bottom:14px;font-family:inherit;background:#fff}
+    .se-in:focus{outline:none;border-color:#C9785A;box-shadow:0 0 0 3px rgba(201,120,90,.15)}
+    .se-btn{width:100%;padding:11px 16px;font-size:14px;font-weight:600;color:#fff;
+      background:#C9785A;border:0;border-radius:8px;cursor:pointer;font-family:inherit}
+    .se-btn:hover{background:#B0603F}
+    .se-btn[disabled]{opacity:.6;cursor:default}
+    .se-err{font-size:12.5px;color:#B0603F;margin:12px 0 0;display:none}
+    .se-note{font-size:11.5px;color:#8A93A0;margin:18px 0 0;line-height:1.5}
+  </style>
+</head>
+  <body>
+
+  <div class="se-gate" id="se-gate">
+    <form class="se-card" id="se-form" autocomplete="on">
+      <div class="se-brand">TwentySix Consulting</div>
+      <h1 class="se-title">Sussex Emmaus</h1>
+      <p class="se-sub">Pay &amp; Benefits &middot; Q3 2026</p>
+      <label class="se-lbl" for="se-u">Username</label>
+      <input class="se-in" id="se-u" name="username" autocomplete="username" autocapitalize="none" spellcheck="false" required>
+      <label class="se-lbl" for="se-p">Password</label>
+      <input class="se-in" id="se-p" name="password" type="password" autocomplete="current-password" required>
+      <button class="se-btn" id="se-go" type="submit">Open the dashboard</button>
+      <p class="se-err" id="se-err">That username or password was not recognised.</p>
+      <p class="se-note">This report contains Sussex Emmaus's own pay and benefits data.
+        It is encrypted until you sign in, so it cannot be read without these details.</p>
+    </form>
+  </div>
+
+    <div id="root"></div>
+  </body>
+</html>

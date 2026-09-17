@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+
+    <meta property="og:title" content="Zigbert Pay Intelligence" />
+    <meta property="og:description" content="Personalised salary benchmarking and market insights. A Zigbert demo dashboard." />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="./opengraph.jpg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Zigbert Pay Intelligence" />
+    <meta name="twitter:description" content="Personalised salary benchmarking and market insights. A Zigbert demo dashboard." />
+    <meta name="twitter:image" content="./opengraph.jpg" />
+
+    <link rel="icon" type="image/png" href="./favicon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <title>Zigbert · Pay</title>
+
+    <!-- TwentySix · Zigbert shell — auth gate + URL normalisation (runs before the Vite bundle) -->
+    <script>
+      (function () {
+        var KEY = "sussex-emmaus:temp-auth";
+        // Home = the platform root, base-path aware (works at /pay/ and /<repo>/pay/).
+        function homePath() {
+          var p = window.location.pathname.replace(/\/(pay|benefits)(\/.*)?$/, "");
+          return (p || "") + "/";
+        }
+        function isAuthed() {
+          try {
+            var raw = localStorage.getItem(KEY);
+            if (raw) { var pj = JSON.parse(raw); if (pj && pj.username) return true; }
+          } catch (e) {}
+          try {
+            for (var i = 0; i < localStorage.length; i++) {
+              var k = localStorage.key(i);
+              if (k && k.indexOf("sb-") === 0 && k.indexOf("-auth-token") !== -1) return true;
+            }
+          } catch (e) {}
+          return false;
+        }
+        if (!isAuthed()) { window.location.replace(homePath()); return; }
+        // Normalise /pay/index.html → /pay/ so wouter's base path matches.
+        if (window.location.pathname.match(/\/index\.html$/)) {
+          var clean = window.location.pathname.replace(/\/index\.html$/, "/");
+          window.history.replaceState(null, "", clean + window.location.search + window.location.hash);
+        }
+      })();
+    </script>
+
+    <!-- TwentySix · Zigbert shell — chrome (relative so it survives any mount sub-path) -->
+    <link rel="stylesheet" href="../shell/shell.css" />
+    <link rel="stylesheet" href="../shell/tour.css" />
+    <style>body { padding-top: 60px; }</style>
+
+    <script src="../gate.js"></script>
+  <script>
+  (function () {
+    var ENC = "./assets/app.enc";
+    function boot(bytes) {
+      var url = URL.createObjectURL(new Blob([bytes], { type: "text/javascript" }));
+      var s = document.createElement("script");
+      s.type = "module";
+      s.src = url;
+      document.body.appendChild(s);
+      var g = document.getElementById("se-gate");
+      if (g) g.remove();
+    }
+    async function tryOpen(secret, username) {
+      var bytes = await window.SEGate.load(ENC, secret);
+      window.SEGate.remember(secret, username);
+      boot(bytes);
+    }
+    window.addEventListener("DOMContentLoaded", function () {
+      var remembered = window.SEGate.remembered();
+      if (remembered) {
+        tryOpen(remembered, remembered.split(":")[0]).catch(function () {
+          window.SEGate.forget();
+          window.location.reload();
+        });
+        return;
+      }
+      var f = document.getElementById("se-form");
+      if (!f) return;
+      f.addEventListener("submit", function (e) {
+        e.preventDefault();
+        var u = document.getElementById("se-u").value.trim();
+        var p = document.getElementById("se-p").value;
+        var btn = document.getElementById("se-go");
+        var err = document.getElementById("se-err");
+        err.style.display = "none";
+        btn.disabled = true;
+        btn.textContent = "Unlocking\u2026";
+        // The key is derived from the credentials, so a wrong password simply
+        // fails to decrypt. There is no comparison to bypass.
+        tryOpen(u.toLowerCase() + ":" + p, u).catch(function () {
+          btn.disabled = false;
+          btn.textContent = "Open the dashboard";
+          err.style.display = "block";
+          document.getElementById("se-p").value = "";
+        });
+      });
+    });
+  })();
+  </script>
+
+    <link rel="stylesheet" crossorigin href="./assets/index-CutQLN76.css">
+  
+  <style>
+    .se-gate{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;
+      justify-content:center;background:#fff;font-family:Inter,system-ui,sans-serif;padding:24px}
+    .se-card{width:100%;max-width:420px;text-align:left}
+    .se-brand{font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+      color:#7285A5;margin-bottom:18px}
+    .se-title{font-size:26px;font-weight:700;color:#121C2B;margin:0 0 6px;letter-spacing:-.02em}
+    .se-sub{font-size:13px;color:#5A6472;margin:0 0 22px}
+    .se-lbl{display:block;font-size:12px;font-weight:600;color:#121C2B;margin:0 0 5px}
+    .se-in{width:100%;box-sizing:border-box;padding:10px 12px;font-size:14px;
+      border:1px solid #DEE1E6;border-radius:8px;margin-bottom:14px;font-family:inherit;background:#fff}
+    .se-in:focus{outline:none;border-color:#C9785A;box-shadow:0 0 0 3px rgba(201,120,90,.15)}
+    .se-btn{width:100%;padding:11px 16px;font-size:14px;font-weight:600;color:#fff;
+      background:#C9785A;border:0;border-radius:8px;cursor:pointer;font-family:inherit}
+    .se-btn:hover{background:#B0603F}
+    .se-btn[disabled]{opacity:.6;cursor:default}
+    .se-err{font-size:12.5px;color:#B0603F;margin:12px 0 0;display:none}
+    .se-note{font-size:11.5px;color:#8A93A0;margin:18px 0 0;line-height:1.5}
+  </style>
+</head>
+  <body>
+
+  <div class="se-gate" id="se-gate">
+    <form class="se-card" id="se-form" autocomplete="on">
+      <div class="se-brand">TwentySix Consulting</div>
+      <h1 class="se-title">Sussex Emmaus</h1>
+      <p class="se-sub">Pay &amp; Benefits &middot; Q3 2026</p>
+      <label class="se-lbl" for="se-u">Username</label>
+      <input class="se-in" id="se-u" name="username" autocomplete="username" autocapitalize="none" spellcheck="false" required>
+      <label class="se-lbl" for="se-p">Password</label>
+      <input class="se-in" id="se-p" name="password" type="password" autocomplete="current-password" required>
+      <button class="se-btn" id="se-go" type="submit">Open the dashboard</button>
+      <p class="se-err" id="se-err">That username or password was not recognised.</p>
+      <p class="se-note">This report contains Sussex Emmaus's own pay and benefits data.
+        It is encrypted until you sign in, so it cannot be read without these details.</p>
+    </form>
+  </div>
+
+    <!-- TwentySix · Zigbert shell — fixed top bar -->
+    <header class="ts-shell" role="banner">
+      <div class="ts-shell__inner">
+        <a class="ts-shell__brand" href="../" aria-label="Zigbert, Home">
+          <img class="ts-shell__logo" src="../shell/zigbert-logo.png" alt="Zigbert" />
+          <span class="ts-shell__divider"></span>
+          <span class="ts-shell__brand-sub">Pay &amp; Benefits Intelligence</span>
+        </a>
+
+        <nav class="ts-shell__tabs" aria-label="Sections">
+          <a class="ts-shell__tab" data-ts-shell-tab="home" href="../">Home</a>
+          <a class="ts-shell__tab" data-ts-shell-tab="pay" href="./">Pay</a>
+          <a class="ts-shell__tab" data-ts-shell-tab="benefits" href="../benefits/">Benefits</a>
+          <!-- Trends and Methodology are React routes, so NO trailing slash:
+               "../trends" resolves to /trends (and /<base>/trends under Pages),
+               while "../trends/" would resolve to /trends/, which the wouter
+               route does not match. Same as ../organisation below. -->
+          <a class="ts-shell__tab" data-ts-shell-tab="trends" href="../trends">Trends</a>
+          <a class="ts-shell__tab" data-ts-shell-tab="methodology" href="../methodology">Methodology</a>
+          <a class="ts-shell__tab" data-ts-shell-tab="organisation" href="../organisation">Organisation</a>
+        </nav>
+
+        <div class="ts-shell__user">
+          <button type="button" class="ts-shell__tour" data-zigbert-tour-start aria-label="Tour this page"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg> Tour this page</button>
+          <button
+            type="button"
+            class="ts-shell__user-button"
+            data-ts-shell-userbtn
+            aria-haspopup="menu"
+            aria-expanded="false"
+          >
+            <span class="ts-shell__avatar" data-ts-shell-avatar>··</span>
+            <span class="ts-shell__user-name" data-ts-shell-username>…</span>
+            <svg class="ts-shell__chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+          <div class="ts-shell__menu" data-ts-shell-menu role="menu" data-open="false">
+            <div class="ts-shell__menu-accent" aria-hidden="true"></div>
+            <div class="ts-shell__menu-body">
+              <div class="ts-shell__menu-header">
+                <span class="ts-shell__menu-avatar" data-ts-shell-menu-avatar>··</span>
+                <div>
+                  <div class="ts-shell__menu-name" data-ts-shell-menu-name>…</div>
+                  <div class="ts-shell__menu-status">Signed in</div>
+                </div>
+              </div>
+              <div class="ts-shell__menu-info">
+                <div class="ts-shell__menu-info-row">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                  <span data-ts-shell-menu-email>…</span>
+                </div>
+              </div>
+              <button type="button" class="ts-shell__signout" data-ts-shell-signout>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                Sign out
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div id="root"></div>
+
+    <script defer src="../shell/shell.js"></script>
+    <script defer src="../shell/tour.js"></script>
+  </body>
+</html>
