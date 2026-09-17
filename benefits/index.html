@@ -2630,7 +2630,7 @@
     window.addEventListener("DOMContentLoaded", function () {
       var remembered = window.SEGate.remembered();
       if (remembered) {
-        tryOpen(remembered, remembered.split(":")[0]).catch(function () {
+        tryOpen(remembered, "Sussex Emmaus").catch(function () {
           window.SEGate.forget();
           window.location.reload();
         });
@@ -2647,7 +2647,7 @@
         err.style.display = "none";
         btn.disabled = true;
         btn.textContent = "Unlocking\u2026";
-        tryOpen(u.toLowerCase() + ":" + p, u).catch(function () {
+        tryOpen(u.toLowerCase() + ":" + p, "Sussex Emmaus").catch(function () {
           btn.disabled = false;
           btn.textContent = "Open the dashboard";
           err.style.display = "block";
