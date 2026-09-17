@@ -67,6 +67,9 @@
       document.body.appendChild(s);
       var g = document.getElementById("se-gate");
       if (g) g.remove();
+      document.documentElement.classList.remove("se-unlocking");
+      var w = document.getElementById("se-wait");
+      if (w) w.remove();
     }
     async function tryOpen(secret, username) {
       var bytes = await window.SEGate.load(ENC, secret);
@@ -77,8 +80,12 @@
       var remembered = window.SEGate.remembered();
       if (remembered) {
         tryOpen(remembered, "Sussex Emmaus").catch(function () {
+          // The remembered passphrase no longer works (republished with new
+          // credentials, or tampered storage). Show the gate rather than spinning.
           window.SEGate.forget();
-          window.location.reload();
+          document.documentElement.classList.remove("se-unlocking");
+          var w = document.getElementById("se-wait");
+          if (w) w.remove();
         });
         return;
       }
@@ -106,7 +113,7 @@
   })();
   </script>
 
-    <link rel="stylesheet" crossorigin href="./assets/index-CutQLN76.css">
+    <link rel="stylesheet" crossorigin href="./assets/index-QalyADpz.css">
   
   <style>
     .se-gate{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;
@@ -126,7 +133,28 @@
     .se-btn[disabled]{opacity:.6;cursor:default}
     .se-err{font-size:12.5px;color:#B0603F;margin:12px 0 0;display:none}
     .se-note{font-size:11.5px;color:#8A93A0;margin:18px 0 0;line-height:1.5}
+    /* Set before first paint when the passphrase is already held, so moving
+       between Home, Pay and Benefits does not flash the sign-in screen. Those two
+       are separate pages, so each is a full load and the gate would otherwise
+       paint for the few hundred ms the decryption takes. */
+    .se-unlocking .se-gate{display:none!important}
+    .se-unlocking .se-wait{display:flex}
+    .se-wait{display:none;position:fixed;inset:0;z-index:99998;align-items:center;
+      justify-content:center;background:#fff}
+    .se-wait span{width:22px;height:22px;border-radius:50%;border:2.5px solid #E7EAEF;
+      border-top-color:#C9785A;animation:se-spin .7s linear infinite}
+    @keyframes se-spin{to{transform:rotate(360deg)}}
   </style>
+  <script>
+    // Runs before the body paints. If this session already unlocked, the gate is
+    // hidden from the start and a quiet spinner stands in until the bundle is
+    // decrypted and mounted.
+    try {
+      if (sessionStorage.getItem("sussex-emmaus:unlock")) {
+        document.documentElement.classList.add("se-unlocking");
+      }
+    } catch (e) {}
+  </script>
 </head>
   <body>
 
@@ -145,6 +173,7 @@
         It is encrypted until you sign in, so it cannot be read without these details.</p>
     </form>
   </div>
+  <div class="se-wait" id="se-wait" aria-hidden="true"><span></span></div>
 
     <!-- TwentySix · Zigbert shell — fixed top bar -->
     <header class="ts-shell" role="banner">

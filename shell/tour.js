@@ -426,8 +426,24 @@
     if (prompt && prompt.parentNode) prompt.parentNode.removeChild(prompt);
     prompt = null;
   }
-  function maybeOffer() {
-    if (!authed() || getState().active || prompt) return;
+  function locked() {
+    // The published site sits behind a decryption gate, and unlocking writes the
+    // auth record this script reads. localStorage outlives the session while the
+    // gate's own sessionStorage does not, so on a return visit authed() is already
+    // true while the sign-in is still on screen, and the welcome card appeared over
+    // the password box. Wait for the gate to go.
+    return !!document.getElementById("se-gate");
+  }
+  function maybeOffer(tries) {
+    tries = tries || 0;
+    if (getState().active || prompt) return;
+    // The app boots only after the bundle is decrypted, so the anchors this card
+    // sits beside do not exist yet. Keep looking for about 20 seconds.
+    if ((!authed() || locked()) && tries < 40) {
+      setTimeout(function () { maybeOffer(tries + 1); }, 500);
+      return;
+    }
+    if (!authed() || locked()) return;
     var key = tourHere();
     if (!key || wasOffered(key) || isDone(key)) return;
     var t = TOURS[key];
@@ -534,7 +550,7 @@
       }, 100);
     }
     if (getState().active) { navigating = false; render(); }
-    else setTimeout(maybeOffer, 900);
+    else setTimeout(function () { maybeOffer(0); }, 900);
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
   else init();

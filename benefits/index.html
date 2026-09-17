@@ -2231,6 +2231,23 @@
 
     /* Add a hair more breathing room inside mini-cards now they have an accent stripe */
     .howto-mini-card { padding: 14px 14px 14px 14px; padding-top: 16px; }
+
+    .haq-cell-sec { color: #5A6472; }
+    /* The fourth column was cramped to a couple of words per line. Give the three
+       primary columns a little back and let this one breathe. */
+    .haq-tbl-wrap table { table-layout: fixed; }
+    .haq-th-sec, .haq-cell-sec { width: 17%; }
+    .haq-th-name { width: 18%; }
+    .haq-tbl-wrap thead th.haq-th-sec { color: #7285A5; }
+    .qd-second { margin-top: 14px; padding-top: 13px; border-top: 1px solid #E7EAEF; }
+    .qd-second-head { font-size: 11px; font-weight: 700; letter-spacing: .08em;
+      text-transform: uppercase; color: #7285A5; margin-bottom: 9px; }
+    .qd-second-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .qd-second-grid > div { font-size: 12.5px; color: #121C2B; line-height: 1.45; }
+    .qd-second-lbl { display: block; font-size: 10.5px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: .06em; color: #8A93A0; margin-bottom: 3px; }
+    .qd-second-note { font-size: 12.5px; color: #5A6472; margin: 10px 0 0; line-height: 1.55; }
+    @media (max-width: 780px) { .qd-second-grid { grid-template-columns: 1fr; } }
 </style>
 
 <style>
@@ -2579,7 +2596,28 @@
     .se-btn[disabled]{opacity:.6;cursor:default}
     .se-err{font-size:12.5px;color:#B0603F;margin:12px 0 0;display:none}
     .se-note{font-size:11.5px;color:#8A93A0;margin:18px 0 0;line-height:1.5}
+    /* Set before first paint when the passphrase is already held, so moving
+       between Home, Pay and Benefits does not flash the sign-in screen. Those two
+       are separate pages, so each is a full load and the gate would otherwise
+       paint for the few hundred ms the decryption takes. */
+    .se-unlocking .se-gate{display:none!important}
+    .se-unlocking .se-wait{display:flex}
+    .se-wait{display:none;position:fixed;inset:0;z-index:99998;align-items:center;
+      justify-content:center;background:#fff}
+    .se-wait span{width:22px;height:22px;border-radius:50%;border:2.5px solid #E7EAEF;
+      border-top-color:#C9785A;animation:se-spin .7s linear infinite}
+    @keyframes se-spin{to{transform:rotate(360deg)}}
   </style>
+  <script>
+    // Runs before the body paints. If this session already unlocked, the gate is
+    // hidden from the start and a quiet spinner stands in until the bundle is
+    // decrypted and mounted.
+    try {
+      if (sessionStorage.getItem("sussex-emmaus:unlock")) {
+        document.documentElement.classList.add("se-unlocking");
+      }
+    } catch (e) {}
+  </script>
 </head>
 <body>
 
@@ -2598,6 +2636,7 @@
         It is encrypted until you sign in, so it cannot be read without these details.</p>
     </form>
   </div>
+  <div class="se-wait" id="se-wait" aria-hidden="true"><span></span></div>
   <div id="se-root"></div>
   <script src="../gate.js"></script>
 
@@ -2621,6 +2660,9 @@
       }
       var g = document.getElementById("se-gate");
       if (g) g.remove();
+      document.documentElement.classList.remove("se-unlocking");
+      var w = document.getElementById("se-wait");
+      if (w) w.remove();
     }
     async function tryOpen(secret, username) {
       var bytes = await window.SEGate.load(ENC, secret);
@@ -2631,8 +2673,12 @@
       var remembered = window.SEGate.remembered();
       if (remembered) {
         tryOpen(remembered, "Sussex Emmaus").catch(function () {
+          // The remembered passphrase no longer works (republished with new
+          // credentials, or tampered storage). Show the gate rather than spinning.
           window.SEGate.forget();
-          window.location.reload();
+          document.documentElement.classList.remove("se-unlocking");
+          var w = document.getElementById("se-wait");
+          if (w) w.remove();
         });
         return;
       }
