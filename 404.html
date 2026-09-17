@@ -4,9 +4,17 @@
     <meta charset="utf-8">
     <title>Zigbert</title>
     <script>
-      // GitHub Pages SPA: redirect all 404s back to index with path stored in sessionStorage
-      var pathSegmentsToKeep = 1;
+      // GitHub Pages SPA fallback. Pages serves THIS file for any missing path, so
+      // it has to route deep links to the right app.
+      //
+      // There are two SPAs here: the platform at <repo>/ and the Pay dashboard at
+      // <repo>/pay/. Keeping one segment sent /repo/pay/role-details to the platform
+      // router, which has no such route, so every Pay deep link and every refresh of
+      // a Pay page died on a not-found. Keep two segments when the path is inside
+      // /pay/ so the redirect lands on the Pay app's own index instead.
       var l = window.location;
+      var parts = l.pathname.split('/');
+      var pathSegmentsToKeep = (parts[2] === 'pay') ? 2 : 1;
       l.replace(
         l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
         l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/') + '/?/' +

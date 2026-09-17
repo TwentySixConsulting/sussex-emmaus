@@ -55,6 +55,21 @@
     <link rel="stylesheet" href="../shell/tour.css" />
     <style>body { padding-top: 60px; }</style>
 
+    <!-- GitHub Pages SPA redirect handler. 404.html rewrites a deep link into
+         "?/role-details"; this turns it back into a real path before the router
+         reads it. Without it every Pay deep link lands on not-found. -->
+    <script>
+      (function(l) {
+        if (l.search[1] === '/') {
+          var decoded = l.search.slice(1).split('&').map(function(s) {
+            return s.replace(/~and~/g, '&');
+          }).join('?');
+          window.history.replaceState(null, null,
+            l.pathname.slice(0, -1) + decoded + l.hash
+          );
+        }
+      }(window.location));
+    </script>
     <script src="../gate.js"></script>
   <script>
   (function () {
