@@ -89,7 +89,12 @@
 
     // Populate username + email
     var username = auth.username;
-    var email = auth.email || (username + "@demo.twentysixconsulting.co.uk");
+    // The demo's domain, and a straight concatenation of the display name, which
+    // for a two-word organisation produced "Sussex Emmaus@demo.twentysix...":
+    // a space inside an email address, on the client's own account menu.
+    var local = String(username).trim().toLowerCase()
+      .replace(/[^a-z0-9._-]+/g, ".").replace(/^\.+|\.+$/g, "");
+    var email = auth.email || (local + "@sussexemmaus.org.uk");
     var initials = username.slice(0, 2).toUpperCase();
 
     var pillName = root.querySelector("[data-ts-shell-username]");
