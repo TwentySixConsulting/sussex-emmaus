@@ -204,11 +204,11 @@
           <a class="ts-shell__tab" data-ts-shell-tab="home" href="../">Home</a>
           <a class="ts-shell__tab" data-ts-shell-tab="pay" href="./">Pay</a>
           <a class="ts-shell__tab" data-ts-shell-tab="benefits" href="../benefits/">Benefits</a>
-          <!-- Trends and Methodology are React routes, so NO trailing slash:
-               "../trends" resolves to /trends (and /<base>/trends under Pages),
-               while "../trends/" would resolve to /trends/, which the wouter
-               route does not match. Same as ../organisation below. -->
-          <a class="ts-shell__tab" data-ts-shell-tab="trends" href="../trends">Trends</a>
+          <!-- Methodology is a React route, so NO trailing slash: "../methodology"
+               resolves to /methodology (and /<base>/methodology under Pages), while
+               "../methodology/" would not match the wouter route. Same as
+               ../organisation below. The Trends pill was removed on 21 Sep 2026;
+               see docs/ARCHIVED-TRENDS.md. -->
           <a class="ts-shell__tab" data-ts-shell-tab="methodology" href="../methodology">Methodology</a>
           <a class="ts-shell__tab" data-ts-shell-tab="organisation" href="../organisation">Organisation</a>
         </nav>
