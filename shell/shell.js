@@ -3,7 +3,7 @@
  * - Auth gate: redirects to "/" if no auth marker is present in localStorage.
  *   Honours both the temp-auth key (used until Supabase env vars are wired)
  *   and any Supabase auth token under sb-*-auth-token.
- * - Reads the username + synthesised email so the user pill matches what
+ * - Reads the username so the user pill matches what
  *   the React Home page shows.
  * - Dropdown open/close + click-outside.
  * - Sign out clears local auth markers and bounces back to "/".
@@ -87,14 +87,8 @@
     var root = document.querySelector(".ts-shell");
     if (!root) return;
 
-    // Populate username + email
+    // Populate the username. There is no email to show: see above.
     var username = auth.username;
-    // The demo's domain, and a straight concatenation of the display name, which
-    // for a two-word organisation produced "Sussex Emmaus@demo.twentysix...":
-    // a space inside an email address, on the client's own account menu.
-    var local = String(username).trim().toLowerCase()
-      .replace(/[^a-z0-9._-]+/g, ".").replace(/^\.+|\.+$/g, "");
-    var email = auth.email || (local + "@sussexemmaus.org.uk");
     var initials = username.slice(0, 2).toUpperCase();
 
     var pillName = root.querySelector("[data-ts-shell-username]");
@@ -105,8 +99,6 @@
     if (menuAvatar) menuAvatar.textContent = initials;
     var menuName = root.querySelector("[data-ts-shell-menu-name]");
     if (menuName) menuName.textContent = username;
-    var menuEmail = root.querySelector("[data-ts-shell-menu-email]");
-    if (menuEmail) menuEmail.textContent = email;
 
     // Tab highlight from current pathname (base-path aware).
     //
